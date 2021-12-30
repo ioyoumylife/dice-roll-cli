@@ -5,7 +5,7 @@ use rand::Rng;
 pub fn get_input() -> String {
     let mut input = String::new();
     let _ = std::io::stdin().read_line(&mut input).unwrap();
-    input
+    input.trim().to_string()
 }
 
 pub enum DiceType {
@@ -21,7 +21,7 @@ pub enum DiceType {
 }
 
 impl DiceType {
-    fn from(val: u16) -> Result<DiceType, String> {
+    fn from(val: u16) -> Result<DiceType, &'static str> {
         if val == 2 {return Ok(DiceType::D2);}
         else if val == 3 {return Ok(DiceType::D3);}
         else if val == 4 {return Ok(DiceType::D4);}
@@ -32,11 +32,11 @@ impl DiceType {
         else if val == 20 {return Ok(DiceType::D20);}
         else if val == 100 {return Ok(DiceType::D100);}
         else {
-            return Err(String::from("Error: Could not parse integer into dice type"));
+            return Err("Error: Could not parse integer into dice type\nAllowed dice are d2, d3, d4, d6, d8, d10, d12, d20, d100");
         }
     }
     fn value(&self) -> u8 {
-        match *self {
+        match self {
             DiceType::D2 => 2,
             DiceType::D3 => 3,
             DiceType::D4 => 4,
@@ -93,7 +93,7 @@ impl DiceRoll {
                     } else if n % 2 == 1 {
                         let dt = match DiceType::from(num_u16) {
                             Ok(r) => r, 
-                            Err(_) => return Err("Error: Could not parse dice type from integer"),
+                            Err(e) => return Err(e),
                         };
                         dice.push(dt);
                     } else {
